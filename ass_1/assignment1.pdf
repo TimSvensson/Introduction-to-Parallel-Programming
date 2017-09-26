@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+	
+<html lang="en" >
+
+<head>
+	<title>Uppsala University Web Login Test Service</title>
+	<link rel="stylesheet" type="text/css" href="/idp/css/style.css" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Pragma" content="must-revalidate">
+	<meta http-equiv="Pragma" content="no-store">	
+	<meta charset="utf-8">   	   	
+</head>
+
+<body>
+	<div class="wrapper clearfix">
+    <div class="container clearfix"> 
+   		<div id="hgroup">
+       		<div class="logodiv">			     
+             <h1>Joint Web Login </h1>
+             <h2>Uppsala University </h2>
+           </div>
+       </div>
+    
+       <!-- Row of columns -->
+       <div class="row clearfix">
+       <div class="span-one-third first">
+           	<div class="login">
+				<h2> 
+									       							Logging into internal services at the Uppsala University				         				</h2> 
+				
+				 
+				              
+           		<div class="loginform">
+           		<form id="login" name="login" action="/idp/profile/cas/login;jsessionid=0E63B255B66B5D55D5A64BBA03698F87.uuc-idp005?execution=e1s1" method="post" class="fm-v clearfix" autocomplete="off">
+     					        				                    
+        				 			              <div class="form-element-wrapper">
+			                <label for="username">User identity:</label>
+			                <input class="form-element form-field required" id="username" name="j_username" type="text" tabindex="1" accesskey="a" 
+			                	value="">
+			              </div>
+			
+			              <div class="form-element-wrapper">
+			                <label for="password">Password A:</label>
+			                <input class="form-element form-field required" id="password" name="j_password" type="password" value="" tabindex="2" accesskey="l" >
+			              </div>
+						<!--  
+			              <div class="form-element-wrapper">
+			                <input type="checkbox" name="donotcache" value="1"> Don't Remember Login			              </div>
+			           	-->
+			            						<!-- 
+			              <div class="form-element-wrapper">
+			                <input id="_shib_idp_revokeConsent" type="checkbox" name="_shib_idp_revokeConsent" value="true">
+			                Clear prior granting of permission for release of your information to this service.			              </div>
+			 			-->
+			            				
+			              <div class="btn-row">
+			                <button class="form-element form-button btn-submit" type="submit" name="_eventId_proceed" tabindex="3" accesskey="o"
+			                    onClick="this.childNodes[0].nodeValue='Logging in, please wait...'"
+			                    >Login</button>
+			              </div>
+			                        	
+                   	</form>
+					<script type="text/javascript" language="JavaScript">document.forms['login'].elements['username'].focus();</script>	    
+         		</div>        			    
+            	<p><a href="https://mp.uu.se/c/perm/link?p=1334916"  tabindex="4" >Lost password </a></p>	   	
+			</div>
+       </div>
+
+		<div class="span-one-third middle">
+                <div class="loginService">   			    
+					<h2>Information about Joint Web Login</h2>
+					<p></p>
+					<div>					
+											        
+																								 						</div>
+
+	           </div>
+           </div>
+           <div class="span-one-third last">
+                <div class="security">                	
+                  <h2>Security information</h2>
+                  <h3>Mandatory change of password</h3>
+                  <p>If you have a password A that is older than two years, you will be forced to change the password before you can access the requested web-service. </p>
+                  <h3>Accept the user agreement</h3>
+                  <p>Once every two years, you must accept the University's Acceptable Use Policy before you are allowed access to the requested web-service. </p>
+                  <h3>When you are finished </h3>
+                  <p>For privacy and security reasons, please exit all your web browser windows when you are done accessing services that require authentication! With Apple MacOS X you must also close the application, not only the windows. If you're using a public computer it's important that you close all web browser windows when you're finished. </p>
+                </div>                
+            </div>
+          </div><!-- .row -->
+    
+    <!-- End main content area -->
+    <!-- Site Footer -->      
+          <div class="clearfix footer" id="siteinfo">
+		  <p></p>
+          <p><a href="http://www.uu.se/">Uppsala University</a> 
+    | <a href="mailto:helpdesk@uu.se">Contact </a> | <a target="_blank" href="https://weblogin.uu.se">Information about Joint Web Login </a><a target="_blank" href="https://weblogin.uu.se/english.html"></a></p>
+          </div>
+    
+        </div> <!-- /container -->
+	</div> <!-- /wrapper -->
+  </body>
+</html>
+
