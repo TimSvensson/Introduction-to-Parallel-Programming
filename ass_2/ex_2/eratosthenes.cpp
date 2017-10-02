@@ -1,4 +1,3 @@
-
 //
 //  main.cpp
 //  PosixThreads
@@ -21,6 +20,7 @@
 
 using namespace std;
 
+
 #define NUM_THREADS 5
 
 void *PrintHello(void *threadid) {
@@ -30,24 +30,44 @@ void *PrintHello(void *threadid) {
     pthread_exit(NULL);
 }
 
+void printList(vector<int> list, string print) {
+    
+    for (int i = 0; i < list.size(); i++) {
+        cout << print << list[i] << "\n";
+    }
+}
+
+vector<int> filterList(vector<int> listUnfiltered, int max) {
+    
+    vector<int> listFiltered;
+    
+    for (int x = 0; x < max; x++) {
+        if (listUnfiltered[x] != 0 && listUnfiltered[x] != 1) {
+            listFiltered.push_back(listUnfiltered[x]);
+        }
+    }
+    
+    //printList(listFiltered, "Filtered list contents: ");
+    return listFiltered;
+}
+
 int main (int argc, char *argv[]) {
     
     if (argc == 1) {
-        cout << "Usage: ./main 'number'.\n Second flags: print=filtered, print=unfiltered \n";
+        cout << "Usage: ./main 'number'.\n";
     } else {
         
-        int threadCount = std::thread::hardware_concurrency();
+        int threadCount = thread::hardware_concurrency();
         int chunks = threadCount/2;
-        int max = std::stoi(argv[1]);
+        int max = stoi(argv[1]);
+        int squareOfMax = ceil(sqrt(max)) + 1;
         
-        std::vector<int> listUnfiltered(max);
-        std::iota(listUnfiltered.begin(), listUnfiltered.end(), 1);
-        std::vector<int> listFiltered;
+        vector<int> listUnfiltered(max), listRemaining(max - squareOfMax);
+        iota(listUnfiltered.begin(), listUnfiltered.end(), 1);
         
-        cout << "Number of theads in system: " << threadCount << "\n";
         // Loops through a list of integers and sets any non-prime to zero
-        for (int k = 2; k*k <= ceil(sqrt(max)); k++) {
-            for (int i = k*k; i < max; i++) {
+        for (int k = 2; k*k <= squareOfMax; k++) {
+            for (int i = k*k; i <= squareOfMax; i++) {
                 if (listUnfiltered[i - 1] % k == 0  )  {
                     listUnfiltered[i - 1 ] = 0;
                 }
@@ -55,28 +75,34 @@ int main (int argc, char *argv[]) {
             cout << "Finished checking for multiples of " << k << "\n";
         }
         
-        // Loops through a list and adds any non-zero to a new list
-        for (int x = 0; x < max; x++) {
-            if (listUnfiltered[x] != 0 && listUnfiltered[x] != 1) {
-                listFiltered.push_back(listUnfiltered[x]);
-            }
-        }
+        // Filter out zeroes from above list
+        vector<int> listFiltered = filterList(listUnfiltered, squareOfMax);
         
-        if (argv[2]) {
-            if (!strcmp(argv[2], "print=unfiltered")) {
-                for (int i = 0; i < max; i++) {
-                    cout << "Unfiltered list: " << listUnfiltered[i] << "\n";
-                }
-            } else if (!strcmp(argv[2], "print=filtered")) {
-                for (int i = 0; i < listFiltered.size(); i++) {
-                    cout << "Filtered list: " << listFiltered[i] << "\n";
+        // Fill a list of remaining ints starting from +1 of the filtered list's last number
+        iota(listRemaining.begin(), listRemaining.end(), (listFiltered.back() + 1));
+        
+        // Checks the remaining list for multiples of the filtered primes and sets these to zero
+        for (int i = 0; i < listRemaining.size(); i++) {
+            for (int y = 0; y < listFiltered.size(); y++) {
+                if (listRemaining[i] % listFiltered[y] == 0) {
+                    listRemaining[i] = 0;
                 }
             }
-            
         }
+        cout << "listRemaining count: " << listRemaining.size() << "\n";
+        // Final result of doing things sequentially
+        vector<int> finalList = filterList(listRemaining, listRemaining.size());
+        
+        
+        
         
         /*
+         Principle: Calculate primes in sqrt(max) + 1,
+         
+         
+         
          To paralellize:
+         Array must be divided in P chunks
          Divide up the array in chunks with decreasing amount of numbers according to:
          For loop:
          ( (Number count of array) / cores ) * 1/x
@@ -85,7 +111,7 @@ int main (int argc, char *argv[]) {
          */
     }
     
-    
+    return 0;
     
     
     
@@ -109,3 +135,4 @@ int main (int argc, char *argv[]) {
      
      */
 }
+
