@@ -1,10 +1,11 @@
 //
 //  main.cpp
-//  PosixThreads
+//  cplustest
 //
-//  Created by Adam Woods on 2017-10-01.
+//  Created by Adam Woods on 2017-10-05.
 //  Copyright © 2017 Adam Woods. All rights reserved.
 //
+
 #include <iostream>
 #include <cstdlib>
 #include <pthread.h>
@@ -85,30 +86,29 @@ void *getPrimes(void *arg) {
 }
 
 void calculatePrimesThreaded(vector<vector<bool>> threadVectors, vector<int> indexPositions, vector<int> primeMultiples, thread_args *p) {
-    /*
-     p->primeMultiples = primeMultiples;
-     
-     pthread_t threads[threadVectors.size()];
-     int rc;
-     int i;
-     
-     int startIndex = 0;
-     
-     for( i = 0; i < threadVectors.size(); i++ ) {
-     p->listToCheck = threadVectors[i];
-     startIndex = p->indexPositions[i];
-     cout << "Send list of size: " << p->listToCheck.size() << "\n";
-     rc = pthread_create(&threads[i], NULL, getPrimes, p);
-     
-     if (rc) {
-     cout << "Error:unable to create thread," << rc << endl;
-     exit(-1);
-     }
-     }
-     
-     
-     pthread_exit(NULL);
-     */
+    
+    p->primeMultiples = primeMultiples;
+    
+    pthread_t threads[threadVectors.size()];
+    int rc;
+    int i;
+    
+    int startIndex = 0;
+    
+    for( i = 0; i < threadVectors.size(); i++ ) {
+        p->listToCheck = threadVectors[i];
+        startIndex = p->indexPositions[i];
+        cout << "Send list of size: " << p->listToCheck.size() << "\n";
+        rc = pthread_create(&threads[i], NULL, getPrimes, p);
+        
+        if (rc) {
+            cout << "Error:unable to create thread," << rc << endl;
+            exit(-1);
+        }
+    }
+    
+    
+    pthread_exit(NULL);
 }
 
 
@@ -224,7 +224,7 @@ int main(int argc, const char * argv[]) {
                 }
             }
         }
-        
+       
         
         divideList(max, squareOfMax, threadCount, primeMultiples);
         
