@@ -1,0 +1,51 @@
+Results from running integration.out with different arguments.
+
+Running with 1 thread(s)
+    result 3.000, trapezes 1, threads 1, ms 0.083
+    result 3.140, trapezes 10, threads 1, ms 0.045
+    result 3.142, trapezes 100, threads 1, ms 0.115
+    result 3.142, trapezes 1000, threads 1, ms 0.100
+    result 3.142, trapezes 10000, threads 1, ms 0.037
+    result 3.142, trapezes 100000, threads 1, ms 4.091
+    result 3.142, trapezes 1000000, threads 1, ms 42.024
+
+Running with 2 thread(s)
+    result 3.000, trapezes 1, threads 1, ms 0.102
+    result 3.140, trapezes 10, threads 2, ms 0.130
+    result 3.142, trapezes 100, threads 2, ms 0.133
+    result 3.142, trapezes 1000, threads 2, ms 0.124
+    result 3.142, trapezes 10000, threads 2, ms 0.148
+    result 3.142, trapezes 100000, threads 2, ms 1.074
+    result 3.142, trapezes 1000000, threads 2, ms 37.973
+
+Running with 4 thread(s)
+    result 3.000, trapezes 1, threads 1, ms 0.111
+    result 3.140, trapezes 10, threads 4, ms 0.138
+    result 3.142, trapezes 100, threads 4, ms 0.120
+    result 3.142, trapezes 1000, threads 4, ms 0.168
+    result 3.142, trapezes 10000, threads 4, ms 0.323
+    result 3.142, trapezes 100000, threads 4, ms 1.476
+    result 3.142, trapezes 1000000, threads 4, ms 52.766
+
+Running with 8 thread(s)
+    result 3.000, trapezes 1, threads 1, ms 0.081
+    Failed to join thread 5
+Failed to join thread 6
+Failed to join thread 7
+result 3.140, trapezes 10, threads 8, ms 0.188
+    result 3.142, trapezes 100, threads 8, ms 0.778
+    result 3.142, trapezes 1000, threads 8, ms 0.388
+    result 3.142, trapezes 10000, threads 8, ms 0.581
+    result 3.142, trapezes 100000, threads 8, ms 2.745
+    result 3.142, trapezes 1000000, threads 8, ms 34.336
+
+Running with 16 thread(s)
+    result 3.000, trapezes 1, threads 1, ms 0.098
+    result 3.140, trapezes 10, threads 10, ms 1.278
+    Failed to join thread 15
+result 3.332, trapezes 100, threads 16, ms 1.442
+    result 3.142, trapezes 1000, threads 16, ms 1.917
+    result 3.142, trapezes 10000, threads 16, ms 2.047
+    result 3.142, trapezes 100000, threads 16, ms 3.765
+    result 3.142, trapezes 1000000, threads 16, ms 17.162
+
