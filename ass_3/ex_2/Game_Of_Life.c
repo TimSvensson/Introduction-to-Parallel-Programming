@@ -11,7 +11,7 @@
           or multiple time steps!
  ******************************************************/
 
-
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -80,7 +80,7 @@ int main (int argc, char * argv[]) {
 	struct timeval ts,tf;
 
 	/*Read input arguments*/
-	if (argc != 3) {
+	if (!(argc == 3 || argc == 4)) {
 		fprintf(stderr, "Usage: ./exec ArraySize TimeSteps\n");
 		exit(-1);
 	}
@@ -100,29 +100,74 @@ int main (int argc, char * argv[]) {
 	#endif
 
 	/*Game of Life*/
+	int num_proc = sysconf(_SC_NPROCESSORS_ONLN);
+	int chunk = N / num_proc;
+
+	fprintf(stdout, "N %d, num_threads %d, chunk %d\r\n", N, num_proc, chunk);
+	
 
 	gettimeofday(&ts,NULL);
-	for (t = 0 ; t < T ; t++) {
-		for (i = 1 ; i < N-1 ; i++)
-			for (j = 1 ; j < N-1 ; j++) {
-				nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
-					+ previous[i][j-1] + previous[i][j+1] \
-					+ previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
-				if (nbrs == 3 || ( previous[i][j]+nbrs == 3))
-					current[i][j] = 1;
-				else 
-					current[i][j] = 0;
-			}
+	if (argc == 3)
+	  {
+
+#pragma omp parallel shared(current, previous, chunk) private(i, j)
+	    for (t = 0 ; t < T ; t++)
+	      {
 	
-		#ifdef OUTPUT
+#pragma omp for schedule(dynamic, chunk)
+		  for (i = 1 ; i < N-1 ; i++)
+		    {
+		      for (j = 1 ; j < N-1 ; j++)
+			{
+			  nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
+			    + previous[i][j-1] + previous[i][j+1]	\
+			    + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
+			  if (nbrs == 3 || ( previous[i][j]+nbrs == 3)) {
+			    current[i][j] = 1;
+			  } else {
+			    current[i][j] = 0;
+			  }
+			}
+		    }
+		  
+	  
+#ifdef OUTPUT
 		print_to_pgm(current, N, t+1);
-		#endif
+#endif
 		//Swap current array with previous array 
 		swap = current;
 		current = previous;
 		previous = swap;
+	      }
+	  }
+	else
+	  {
+	    for (t = 0 ; t < T ; t++)
+	      {
+		for (i = 1 ; i < N-1 ; i++)
+		  {
+		    for (j = 1 ; j < N-1 ; j++)
+		      {
+			nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
+			  + previous[i][j-1] + previous[i][j+1]		\
+			  + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
+			if (nbrs == 3 || ( previous[i][j]+nbrs == 3)) {
+			  current[i][j] = 1;
+			} else {
+			  current[i][j] = 0;
+			}
+		      }     
+		  }
+#ifdef OUTPUT
+	    print_to_pgm(current, N, t+1);
+#endif
+	    //Swap current array with previous array 
+	    swap = current;
+	    current = previous;
+	    previous = swap;
+	      }
+	  }
 
-	}
 	gettimeofday(&tf,NULL);
 	time = (tf.tv_sec-ts.tv_sec)+(tf.tv_usec-ts.tv_usec)*0.000001;
 
