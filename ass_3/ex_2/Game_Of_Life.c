@@ -109,18 +109,14 @@ int main (int argc, char * argv[]) {
 	gettimeofday(&ts,NULL);
 	if (argc == 3)
 	  {
-          int tid;
-
           
+#pragma omp parallel //shared(current, previous, chunk) private(i, j)
+          {
+
           for (t = 0 ; t < T ; t++)
 	      {
-#pragma omp parallel for schedule(dynamic, chunk) shared(current, previous, chunk) private(i, j)
-
-              /*
-              tid = omp_get_thread_num();
-              printf("ThreadID = %d\n", tid);
-*/
-              // Använder inte collapse() för dessa, bara yttre loopen är paralleliserad?
+              printf("ThreadID: %d \n", __builtin_omp_get_thread_num());
+#pragma omp for //schedule(dynamic, chunk)
 		  for (i = 1 ; i < N-1 ; i++)
 		    {
 		      for (j = 1 ; j < N-1 ; j++)
@@ -136,7 +132,8 @@ int main (int argc, char * argv[]) {
 			}
 		    }
 		  
-	  
+#pragma omp single
+              {
 #ifdef OUTPUT
 		print_to_pgm(current, N, t+1);
 #endif
@@ -144,7 +141,9 @@ int main (int argc, char * argv[]) {
 		swap = current;
 		current = previous;
 		previous = swap;
+              }
 	      }
+          }
 	  }
 	else
 	  {
