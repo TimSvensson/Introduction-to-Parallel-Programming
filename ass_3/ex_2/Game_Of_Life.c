@@ -80,7 +80,7 @@ int main (int argc, char * argv[]) {
 	struct timeval ts,tf;
 
 	/*Read input arguments*/
-	if (!(argc == 3 || argc == 4)) {
+	if (argc != 3) {
 		fprintf(stderr, "Usage: ./exec ArraySize TimeSteps\n");
 		exit(-1);
 	}
@@ -107,70 +107,37 @@ int main (int argc, char * argv[]) {
 	
 
 	gettimeofday(&ts,NULL);
-	if (argc == 3)
+	    
+	//#pragma omp parallel num_threads(3) // shared(current, previous, chunk) private(i, j)
+	for (t = 0 ; t < T ; t++)
 	  {
-          
-#pragma omp parallel //shared(current, previous, chunk) private(i, j)
-          {
-
-          for (t = 0 ; t < T ; t++)
-	      {
-              printf("ThreadID: %d \n", __builtin_omp_get_thread_num());
-#pragma omp for //schedule(dynamic, chunk)
-		  for (i = 1 ; i < N-1 ; i++)
-		    {
-		      for (j = 1 ; j < N-1 ; j++)
-			{
-			  nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
-			    + previous[i][j-1] + previous[i][j+1]	\
-			    + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
-			  if (nbrs == 3 || ( previous[i][j]+nbrs == 3)) {
-			    current[i][j] = 1;
-			  } else {
-			    current[i][j] = 0;
-			  }
-			}
-		    }
-		  
-#pragma omp single
-              {
-#ifdef OUTPUT
-		print_to_pgm(current, N, t+1);
-#endif
-		//Swap current array with previous array 
-		swap = current;
-		current = previous;
-		previous = swap;
-              }
-	      }
-          }
-	  }
-	else
-	  {
-	    for (t = 0 ; t < T ; t++)
-	      {
-		for (i = 1 ; i < N-1 ; i++)
-		  {
-		    for (j = 1 ; j < N-1 ; j++)
-		      {
-			nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
-			  + previous[i][j-1] + previous[i][j+1]		\
-			  + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
-			if (nbrs == 3 || ( previous[i][j]+nbrs == 3)) {
-			  current[i][j] = 1;
-			} else {
-			  current[i][j] = 0;
-			}
-		      }     
+	    //printf("t = %d, thread = %d\r\n", t, __builtin_omp_get_thread_num());
+	    
+	    #pragma omp parallel for private(i,j,nbrs) // schedule(dynamic, chunk)
+	    for (i = 1 ; i < N-1 ; i++)
+	      for (j = 1 ; j < N-1 ; j++)
+		{
+		  nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
+		    + previous[i][j-1] + previous[i][j+1]		\
+		    + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
+		  if (nbrs == 3 || ( previous[i][j]+nbrs == 3)) {
+		    current[i][j] = 1;
+		  } else {
+		    current[i][j] = 0;
 		  }
+		  //printf("thread %d, time %d [%d,%d] = %d, nbrs = %d\r\n", __builtin_omp_get_thread_num(), t, i, j, current[i][j], nbrs);
+		}
+		
+            //#pragma omp single
+	    {
 #ifdef OUTPUT
-	    print_to_pgm(current, N, t+1);
+	      print_to_pgm(current, N, t+1);
 #endif
-	    //Swap current array with previous array 
-	    swap = current;
-	    current = previous;
-	    previous = swap;
-	      }
+	      //Swap current array with previous array 
+	      swap = current;
+	      current = previous;
+	      previous = swap;
+	    }
 	  }
 
 	gettimeofday(&tf,NULL);
