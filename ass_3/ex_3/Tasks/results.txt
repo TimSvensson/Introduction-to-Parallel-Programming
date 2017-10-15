@@ -1,0 +1,11 @@
+
+elapsed time = 22.001830 (sec)
+elapsed time = 22.022927 (sec)
+elapsed time = 21.953551 (sec)
+elapsed time = 21.928987 (sec)
+elapsed time = 21.954282 (sec)
+elapsed time = 21.961784 (sec)
+elapsed time = 21.957337 (sec)
+elapsed time = 21.935180 (sec)
+elapsed time = 21.829820 (sec)
+elapsed time = 21.956905 (sec)
