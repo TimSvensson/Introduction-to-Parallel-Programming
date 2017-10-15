@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "timer.h"
 
 void merge(int a[], int temp[], int low, int high, int mid) {
@@ -26,12 +27,16 @@ void merge(int a[], int temp[], int low, int high, int mid) {
 
 void mergesort(int a[], int temp[], int low, int high) {
   int mid;
-  if (low < high) {
-    mid = (low+high)/2;              // find the midpoint
-    mergesort(a, temp, low, mid);    // sort the first half
-    mergesort(a, temp, mid+1, high); // sort the second half
-    merge(a, temp, low, high, mid);  // merge them together into one sorted list
-  }
+  if (low < high)
+    {
+      mid = (low+high)/2;              // find the midpoint
+#pragma omp task
+      mergesort(a, temp, low, mid);    // sort the first half
+#pragma omp task
+      mergesort(a, temp, mid+1, high); // sort the second half
+#pragma omp taskwait
+      merge(a, temp, low, high, mid);  // merge them together into one sorted list
+    }
 }
 
 int main(int argc, char **argv) {

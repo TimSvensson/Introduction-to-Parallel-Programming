@@ -1,16 +1,14 @@
 #!/bin/bash
 
 r_file=results.txt
-echo "" > $r_file
+exe=./Merge_sortP
 
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
+rm $r_file
 
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
-./Merge_sort >> $r_file
+echo "Running $exe and saving the results in $r_file."
+
+for i in {1..3}
+do
+    echo "Running test $i"
+    $exe >> $r_file
+done
