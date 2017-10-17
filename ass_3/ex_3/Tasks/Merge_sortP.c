@@ -7,7 +7,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define TASK_LIMIT 16 //sysconf(_SC_NPROCESSORS_ONLN)
+const int TASK_SIZE_LIMIT = 1000;
+const int RECU_LVL_LIMIT = 5;
 
 void merge(int a[], int temp[], int low, int high, int mid) {
   int i, j, k;
@@ -30,20 +31,36 @@ void merge(int a[], int temp[], int low, int high, int mid) {
   }
 }
 
-void mergesort(int a[], int temp[], int low, int high, int num_tasks) {
+void mergesort_seq(int a[], int temp[], int low, int high) {
+  if (low < high)
+    {
+      int mid = (low+high) / 2;
+
+      mergesort_seq(a, temp, low, mid);    // sort the first half
+      mergesort_seq(a, temp, mid+1, high); // sort the second half
+
+      merge(a, temp, low, high, mid);  // merge them together into one sorted list
+    }
+}
+
+void mergesort(int a[], int temp[], int low, int high) {
   int mid;
   if (low < high)
     {
-      mid = (low+high)/2;              // find the midpoint
-      
-      bool do_task = ((int) pow(2, (double)num_tasks)) <= TASK_LIMIT;
-      //      printf("Tasks: %d, Do: %d\n", num_tasks, do_task);
-      
-#pragma omp task if( do_task )
-      mergesort(a, temp, low, mid, ++num_tasks);    // sort the first half
-#pragma omp task if( do_task )
-      mergesort(a, temp, mid+1, high, ++num_tasks); // sort the second half
+      mid = (low+high)/2;              // find the midpoint     
+      if (high - low > TASK_SIZE_LIMIT)
+	{
+#pragma omp task
+	  mergesort(a, temp, low, mid);    // sort the first half
+#pragma omp task
+	  mergesort(a, temp, mid+1, high); // sort the second half
 #pragma omp taskwait
+	}
+      else
+	{
+	  mergesort_seq(a, temp, low, mid);
+	  mergesort_seq(a, temp, mid+1, high);
+	}
       merge(a, temp, low, high, mid);  // merge them together into one sorted list
     }
 }
@@ -51,10 +68,12 @@ void mergesort(int a[], int temp[], int low, int high, int num_tasks) {
 int main(int argc, char **argv) {
   int LEN;
   double time;
+  //  TASK_LIMIT = sysconf(_SC_NPROCESSORS_ONLN);
   
-  LEN = 100000000;   
+  LEN = 100000000;
+  int N = sysconf (_SC_NPROCESSORS_ONLN);
   // Command line argument: array length
-  if (argc > 1 ) LEN = atoi(argv[1]);  
+  if (argc > 1 ) N = atoi(argv[1]);  
   int i, *x,*temp;
   x = (int *)malloc(sizeof(int)*LEN);
   temp = (int *)malloc(sizeof(int)*LEN);
@@ -75,9 +94,16 @@ int main(int argc, char **argv) {
 
   //  printf("Task limit: %ld\n", TASK_LIMIT);
 
+  omp_set_dynamic(0);
+  omp_set_num_threads(N);
+
   initialize_timer ();  //We are just timing the sort
   start_timer();
-  mergesort(x, temp, 0, (LEN-1), 0);
+#pragma omp parallel firstprivate(x, temp) num_threads(N)
+#pragma omp single
+  {
+    mergesort(x, temp, 0, (LEN-1));
+  }
   stop_timer();
   time = elapsed_time();
   

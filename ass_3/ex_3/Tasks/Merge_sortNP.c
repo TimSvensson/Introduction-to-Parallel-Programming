@@ -30,10 +30,12 @@ void mergesort(int a[], int temp[], int low, int high) {
   if (low < high)
     {
       mid = (low+high)/2;              // find the midpoint
+
 #pragma omp task
       mergesort(a, temp, low, mid);    // sort the first half
 #pragma omp task
       mergesort(a, temp, mid+1, high); // sort the second half
+
 #pragma omp taskwait
       merge(a, temp, low, high, mid);  // merge them together into one sorted list
     }
@@ -43,9 +45,10 @@ int main(int argc, char **argv) {
   int LEN;
   double time;
   
-  LEN = 100000000;   
+  LEN = 100000000;
+  int N = 16;
   // Command line argument: array length
-  if (argc > 1 ) LEN = atoi(argv[1]);  
+  if (argc > 1 ) N = atoi(argv[1]);  
   int i, *x,*temp;
   x = (int *)malloc(sizeof(int)*LEN);
   temp = (int *)malloc(sizeof(int)*LEN);
@@ -66,7 +69,11 @@ int main(int argc, char **argv) {
   
   initialize_timer ();  //We are just timing the sort
   start_timer();
-  mergesort(x, temp, 0, (LEN-1));
+#pragma omp parallel firstprivate(x, temp) num_threads(N)
+#pragma omp single
+  {
+    mergesort(x, temp, 0, (LEN-1));
+  }
   stop_timer();
   time = elapsed_time();
   
