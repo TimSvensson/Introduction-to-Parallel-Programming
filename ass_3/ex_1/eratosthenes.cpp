@@ -104,6 +104,9 @@ int main(int argc, const char * argv[]) {
         // Checks the remaining list for multiples of the filtered primes and sets these to zero
         auto start = std::chrono::high_resolution_clock::now();
         int tid;
+#pragma omp parallel
+        
+#pragma omp for private(tid)
         for (int i = 0; i < listRemaining.size(); i++) {
             for (int y = 0; y < primeMultiples.size(); y++) {
                 if (listRemaining[i] % primeMultiples[y] == 0) {
@@ -117,15 +120,11 @@ int main(int argc, const char * argv[]) {
         
         vector<int> result = filterList(listRemaining, listRemaining.size());
         
-        //printList(result, "Result: ");
+        
         auto finish = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = finish - start;
         std::cout << "Elapsed time: " << elapsed.count() << " s\n";
-        
-        
-        
-        
-        
+        printList(result, "");
     }
     
     return 0;
