@@ -15,6 +15,8 @@
 #include <numeric>
 #include <random>
 #include <thread>
+#include <chrono>
+
 using namespace std;
 
 #define NUM_THREADS 4
@@ -36,7 +38,8 @@ void printList(vector<int> list, string print) {
 vector<int> filterList(vector<int> listUnfiltered, int max) {
     
     vector<int> listFiltered;
-    
+
+#pragma omp for
     for (int x = 0; x < max; x++) {
         if (listUnfiltered[x] != 0 && listUnfiltered[x] != 1) {
             listFiltered.push_back(listUnfiltered[x]);
@@ -66,49 +69,20 @@ vector<bool> fillVector(int startIndex, int length) {
 }
 
 void *getPrimes(void *arg) {
-    thread_args *p = (thread_args*) arg;
+ 
     
-    cout << "list length: " << p->listToCheck.size() << "\n";
-    vector<int> primes;
-    
-    // Checks the remaining list for multiples of the filtered primes and sets the proper index position to zero
-    for (int i = 0; i < p->listToCheck.size(); i++) {
-        for (int y = 0; y < p->primeMultiples.size(); y++) {
-            
-        }
-    }
-    // Sends the unfiltered indexPosition list to a function that removes anything that is zero
-    vector<int> finalList = filterList(p->indexPositions, p->listToCheck.size());
-    p->indexPositions = finalList;
-    
-    
-    pthread_exit(NULL);
 }
 
-void calculatePrimesThreaded(vector<vector<bool>> threadVectors, vector<int> indexPositions, vector<int> primeMultiples, thread_args *p) {
+void calculatePrimesThreaded(vector<vector<bool>> threadVectors, vector<int> indexPositions, vector<int> primeMultiples, int squareOfMax) {
     
-    p->primeMultiples = primeMultiples;
-    
-    pthread_t threads[threadVectors.size()];
-    int rc;
-    int i;
-    
-    int startIndex = 0;
-    
-    for( i = 0; i < threadVectors.size(); i++ ) {
-        p->listToCheck = threadVectors[i];
-        startIndex = p->indexPositions[i];
-        cout << "Send list of size: " << p->listToCheck.size() << "\n";
-        rc = pthread_create(&threads[i], NULL, getPrimes, p);
-        
-        if (rc) {
-            cout << "Error:unable to create thread," << rc << endl;
-            exit(-1);
+    for (int i = 0; i < indexPositions.size(); i++) {
+        for (int j = indexPositions[i]; j < indexPositions[i + 1]; j++) {
+            for (int x = 0; x < primeMultiples.size(); x++) {
+                
+            }
         }
     }
     
-    
-    pthread_exit(NULL);
 }
 
 
@@ -118,11 +92,11 @@ void divideList(int max, int squareOfMax, int threadCount, vector<int> primeMult
     vector<vector<bool>> primeVectors(threadCount);
     for (int i = 0; i < primeVectors.size(); i++) {
         vector<bool> x = {false};
-        //cout << "x: " << x[i] << "\n";
         primeVectors[i] = x;
     }
     
     vector<int> indexPositions;
+    indexPositions.push_back(squareOfMax + 1);
     vector<int> threadIndex(threadCount);
     iota(threadIndex.begin(), threadIndex.end(), 0);
     
@@ -179,8 +153,8 @@ void divideList(int max, int squareOfMax, int threadCount, vector<int> primeMult
     for (int i = 0; i < threadCount; i++) {
         cout << "index positions: " << indexPositions[i] << "\n";
     }
-    thread_args *p = new thread_args;
-    calculatePrimesThreaded(primeVectors, indexPositions, primeMultiples, p);
+    
+    calculatePrimesThreaded(primeVectors, indexPositions, primeMultiples, squareOfMax);
     cout << "DONE! \n";
 }
 
@@ -195,7 +169,6 @@ int main(int argc, const char * argv[]) {
         int max = stoi(argv[1]);
         int squareOfMax = ceil(sqrt(max)) + 1;
         
-        
         vector<int> listUnfiltered(max), listRemaining(max - squareOfMax);
         iota(listUnfiltered.begin(), listUnfiltered.end(), 1);
         
@@ -206,27 +179,43 @@ int main(int argc, const char * argv[]) {
                     listUnfiltered[i - 1 ] = 0;
                 }
             }
-            cout << "Finished checking for multiples of " << k << "\n";
+            //cout << "Finished checking for multiples of " << k << "\n";
         }
         
         // Filter out zeroes from above list, use this list to compare the other lists
         vector<int> primeMultiples = filterList(listUnfiltered, squareOfMax);
-        printList(primeMultiples, "Filtered list: ");
+        
         
         // Fill a list of remaining ints starting from +1 of the filtered list's last number
         iota(listRemaining.begin(), listRemaining.end(), (primeMultiples.back() + 1));
+        //printList(listRemaining, "Unfiltered :");
         
         // Checks the remaining list for multiples of the filtered primes and sets these to zero
-        for (int i = 0; i < listRemaining.size(); i++) {
-            for (int y = 0; y < primeMultiples.size(); y++) {
-                if (listRemaining[i] % primeMultiples[y] == 0) {
-                    listRemaining[i] = 0;
+        auto start = std::chrono::high_resolution_clock::now();
+        int tid;
+#pragma omp parallel
+        
+        #pragma omp for private(tid)
+            for (int i = 0; i < listRemaining.size(); i++) {
+                for (int y = 0; y < primeMultiples.size(); y++) {
+                    if (listRemaining[i] % primeMultiples[y] == 0) {
+                        //tid = __builtin_omp_get_thread_num();
+                        //printf("Thread id: %d \n", tid);
+                        listRemaining[i] = 0;
+                    }
                 }
             }
-        }
-       
         
-        divideList(max, squareOfMax, threadCount, primeMultiples);
+        
+        vector<int> result = filterList(listRemaining, listRemaining.size());
+        
+        //printList(result, "Result: ");
+        auto finish = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = finish - start;
+        std::cout << "Elapsed time: " << elapsed.count() << " s\n";
+        
+        
+        
         
         
     }
