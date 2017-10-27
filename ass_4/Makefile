@@ -3,9 +3,9 @@
 # http://hpcf.umbc.edu/general-productivity/checking-which-cpus-are-used-by-your-program/
 #
 
-OBJS := hello_world.o
+OBJS := mpi_solution.o
 
-EXECUTABLE := hello_world_mpi
+EXECUTABLE := ass4
 
 CC := mpicc
 
