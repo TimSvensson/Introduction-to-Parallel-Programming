@@ -3,7 +3,7 @@
 # http://hpcf.umbc.edu/general-productivity/checking-which-cpus-are-used-by-your-program/
 #
 
-OBJS := mpi_solution.o
+OBJS := mpi_solution.c
 
 EXECUTABLE := ass4
 
@@ -15,18 +15,15 @@ CC := mpicc
 # flags for Portland Group compiler pgcc on maya:
 # CFLAGS := -O3 -c99 -Minform=warn -fastsse
 # flags for GNU compiler gcc anywhere:
-CFLAGS := # -O3 -std=c99 -Wall -Wno-unused-variable
+CFLAGS := -O3 -std=c99 -Wall -Wno-unused-variable
 
 DEFS :=
 INCLUDES :=
-LDFLAGS :=
-LDFLAGS :=
-
-%.o: %.c %.h
-	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) -c $< -o $@
+LDFLAGS := -lm
 
 $(EXECUTABLE): $(OBJS)
 	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -D DEBUG -o $@_DEBUG $(LDFLAGS)
 
 clean:
-	-rm -f *.o $(EXECUTABLE) *~
+	-rm -f *.o $(EXECUTABLE) $(EXECUTABLE)_DEBUG  *~
