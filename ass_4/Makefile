@@ -21,10 +21,17 @@ DEFS :=
 INCLUDES :=
 LDFLAGS := -lm
 
+all: $(EXECUTABLE) ass4_gather
+
 $(EXECUTABLE): $(OBJS)
-	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -o $@ $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -D DEBUG -o $@_DEBUG $(LDFLAGS)
-	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -D TIME -o $@_TIME $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -D DEBUG -o $@_DEBUG $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -D TIME -o $@_TIME $(LDFLAGS)
+
+ass4_gather: mpi_gather.c
+	$(CC) $(CFLAGS) $(INCLUDES) mpi_gather.c -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) mpi_gather.c -D DEBUG -o $@_DEBUG $(LDFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) mpi_gather.c -D TIME -o $@_TIME $(LDFLAGS)
 
 clean:
 	-rm -f *.o $(EXECUTABLE)* *~
