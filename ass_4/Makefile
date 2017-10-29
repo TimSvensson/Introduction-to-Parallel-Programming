@@ -24,6 +24,7 @@ LDFLAGS := -lm
 $(EXECUTABLE): $(OBJS)
 	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -o $@ $(LDFLAGS)
 	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -D DEBUG -o $@_DEBUG $(LDFLAGS)
+	$(CC) $(CFLAGS) $(DEFS) $(INCLUDES) $(OBJS) -D TIME -o $@_TIME $(LDFLAGS)
 
 clean:
-	-rm -f *.o $(EXECUTABLE) $(EXECUTABLE)_DEBUG  *~
+	-rm -f *.o $(EXECUTABLE)* *~

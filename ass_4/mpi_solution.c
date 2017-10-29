@@ -7,7 +7,7 @@
 
 #ifdef TIME
 clock_t time_start, time_stop;
-douvle cpu_time_used;
+double cpu_time_used;
 #endif
 
 int rank, size;
@@ -86,9 +86,9 @@ int main(int argc, char** argv)
 	       rank, name, length, steps, start, stop);
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif
-	
+
 	// FIND FIRST SQRT(M) PRIMES
-	int prime_multiples[sqrt_M];
+	int* prime_multiples = (int*) calloc(sizeof(int), sqrt_M);
 	int prime_multiples_length = 0;
 	find_primes(2, sqrt_M, prime_multiples, &prime_multiples_length,
 		    prime_multiples, &prime_multiples_length);
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
 #endif
 	
 	// FIND ALL PRIMES
-	int pp_arr[steps];
+	int* pp_arr = (int*) calloc(sizeof(int), steps);
 	for (int i = 0; i < steps; i++) pp_arr[i] = 0;
 	int pp_len = 0;
 	find_primes(start, stop, pp_arr, &pp_len, prime_multiples, &prime_multiples_length);
@@ -187,6 +187,8 @@ int main(int argc, char** argv)
 	}
 #endif
 	if (rank == 0) free(result);
+	free(prime_multiples);
+	free(pp_arr);
 	return(0);
 }
 
